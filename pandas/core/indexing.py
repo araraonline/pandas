@@ -453,7 +453,7 @@ class _NDFrameIndexer(_NDFrameIndexerBase):
                         value = Series(value, index=self.obj.columns,
                                        name=indexer)
 
-                    self.obj._data = self.obj.append(value)._data
+                    self.obj._data = self.obj.append(value, sort=False)._data
                     self.obj._maybe_update_cacher(clear=True)
                     return self.obj
 
