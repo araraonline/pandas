@@ -213,7 +213,7 @@ def _add_margins(table, data, values, rows, cols, aggfunc,
         for dtype in set(result.dtypes):
             cols = result.select_dtypes([dtype]).columns
             margin_dummy[cols] = margin_dummy[cols].astype(dtype)
-        result = result.append(margin_dummy)
+        result = result.append(margin_dummy, sort=False)
     except TypeError:
 
         # we cannot reshape, so coerce the axis
