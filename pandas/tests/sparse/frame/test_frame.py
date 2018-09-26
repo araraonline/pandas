@@ -624,7 +624,7 @@ class TestSparseDataFrame(SharedWithSparse):
         a = self.frame[:5]
         b = self.frame[5:]
 
-        appended = a.append(b)
+        appended = a.append(b, sort=False)
         tm.assert_sp_frame_equal(appended, self.frame, exact_indices=False)
 
         a = self.frame.iloc[:5, :3]

@@ -3409,7 +3409,7 @@ class TestTimeGrouper(object):
 
         pad = DataFrame([[fill_value] * 4], index=[3],
                         columns=['A', 'B', 'C', 'D'])
-        expected = normal_result.append(pad)
+        expected = normal_result.append(pad, sort=False)
         expected = expected.sort_index()
         expected.index = date_range(start='2013-01-01', freq='D',
                                     periods=5, name='key')

@@ -252,7 +252,7 @@ class TestDatetimeIndex(object):
         a = DataFrame()
         c = DataFrame({'A': 'foo', 'B': dr}, index=dr)
 
-        result = a.append(c)
+        result = a.append(c, sort=False)
         assert (result['B'] == dr).all()
 
     def test_isin(self):
