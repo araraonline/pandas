@@ -1293,7 +1293,7 @@ class TestCrosstab(object):
                         'E': np.random.randn(11),
                         'F': np.random.randn(11)})
 
-        self.df = df.append(df, ignore_index=True)
+        self.df = df.append(df, ignore_index=True, sort=False)
 
     def test_crosstab_single(self):
         df = self.df

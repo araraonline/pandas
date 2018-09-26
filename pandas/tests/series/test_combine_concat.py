@@ -253,7 +253,7 @@ class TestTimeseries(object):
         df = DataFrame(np.random.randn(len(rng), 4), index=rng)
 
         result = ts.append(ts)
-        result_df = df.append(df)
+        result_df = df.append(df, sort=False)
         ex_index = DatetimeIndex(np.tile(rng.values, 2))
         tm.assert_index_equal(result.index, ex_index)
         tm.assert_index_equal(result_df.index, ex_index)
@@ -287,7 +287,7 @@ class TestTimeseries(object):
         df2 = DataFrame(np.random.randn(len(rng2), 4), index=rng2)
 
         result = ts.append(ts2)
-        result_df = df.append(df2)
+        result_df = df.append(df2, sort=False)
         tm.assert_index_equal(result.index, rng3)
         tm.assert_index_equal(result_df.index, rng3)
 
@@ -310,7 +310,7 @@ class TestTimeseries(object):
         df2 = DataFrame(np.random.randn(len(rng2), 4), index=rng2)
 
         result = ts.append(ts2)
-        result_df = df.append(df2)
+        result_df = df.append(df2, sort=False)
         tm.assert_index_equal(result.index, rng3)
         tm.assert_index_equal(result_df.index, rng3)
 
@@ -331,7 +331,7 @@ class TestTimeseries(object):
         df2 = DataFrame(np.random.randn(len(rng2), 4), index=rng2)
 
         result = ts.append(ts2)
-        result_df = df.append(df2)
+        result_df = df.append(df2, sort=False)
         tm.assert_index_equal(result.index, rng3)
         tm.assert_index_equal(result_df.index, rng3)
 
