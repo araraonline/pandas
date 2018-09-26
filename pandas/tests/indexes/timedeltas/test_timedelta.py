@@ -220,7 +220,7 @@ class TestTimedeltaIndex(DatetimeLike):
         c = DataFrame({'A': 'foo', 'B': td}, index=td)
         str(c)
 
-        result = a.append(c)
+        result = a.append(c, sort=False)
         assert (result['B'] == td).all()
 
     def test_fields(self):

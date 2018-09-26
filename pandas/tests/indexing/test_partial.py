@@ -184,7 +184,7 @@ class TestPartialSetting(object):
 
         s = df.loc[1].copy()
         s.name = 2
-        expected = df.append(s)
+        expected = df.append(s, sort=False)
 
         df.loc[2] = df.loc[1]
         tm.assert_frame_equal(df, expected)
@@ -441,7 +441,7 @@ class TestPartialSetting(object):
         df = orig.copy()
         with catch_warnings(record=True):
             df.loc['a', :] = df.ix[0]
-            exp = orig.append(Series(df.ix[0], name='a'))
+            exp = orig.append(Series(df.ix[0], name='a'), sort=False)
         tm.assert_frame_equal(df, exp)
         tm.assert_index_equal(df.index, Index(orig.index.tolist() + ['a']))
         assert df.index.dtype == 'object'

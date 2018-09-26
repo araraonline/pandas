@@ -489,8 +489,8 @@ class TestMerge(object):
 
         d = {'d': dt.datetime(2013, 11, 5, 5, 56), 't': dt.timedelta(0, 22500)}
         df = DataFrame(columns=list('dt'))
-        df = df.append(d, ignore_index=True)
-        result = df.append(d, ignore_index=True)
+        df = df.append(d, ignore_index=True, sort=False)
+        result = df.append(d, ignore_index=True, sort=False)
         expected = DataFrame({'d': [dt.datetime(2013, 11, 5, 5, 56),
                                     dt.datetime(2013, 11, 5, 5, 56)],
                               't': [dt.timedelta(0, 22500),
@@ -813,8 +813,10 @@ class TestMerge(object):
         assert_frame_equal(result, expected_3)
 
         # Dups on right
-        right_w_dups = right.append(pd.DataFrame({'a': ['e'], 'c': ['moo']},
-                                                 index=[4]))
+        right_w_dups = right.append(
+            pd.DataFrame({'a': ['e'], 'c': ['moo']}, index=[4]),
+            sort=False
+        )
         merge(left, right_w_dups, left_index=True, right_index=True,
               validate='one_to_many')
 
@@ -826,8 +828,10 @@ class TestMerge(object):
             merge(left, right_w_dups, on='a', validate='one_to_one')
 
         # Dups on left
-        left_w_dups = left.append(pd.DataFrame({'a': ['a'], 'c': ['cow']},
-                                               index=[3]), sort=True)
+        left_w_dups = left.append(
+            pd.DataFrame({'a': ['a'], 'c': ['cow']}, index=[3]),
+            sort=True
+        )
         merge(left_w_dups, right, left_index=True, right_index=True,
               validate='many_to_one')
 
