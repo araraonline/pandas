@@ -6338,6 +6338,9 @@ class DataFrame(NDFrame):
         3  3
         4  4
         """
+        if sort is not False and sort is not True:
+            raise ValueError("Sort is {!r}.".format(sort))
+
         kwargs = {
             'ignore_index': ignore_index,
             'verify_integrity': verify_integrity,
