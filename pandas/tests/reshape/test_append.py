@@ -929,31 +929,18 @@ class TestAppendBefore(object):
         expected = DataFrame(np.concatenate((arr1, arr2)))
         assert_frame_equal(result, expected)
 
-    # rewrite sort fixture, since we also want to test default of None
-    def test_append_sorts(self, sort_with_none):
+    def test_append_sorts(self, sort):
         df1 = pd.DataFrame({"a": [1, 2], "b": [1, 2]}, columns=['b', 'a'])
         df2 = pd.DataFrame({"a": [1, 2], 'c': [3, 4]}, index=[2, 3])
+        result = df1.append(df2, sort=sort)
 
-        if sort_with_none is None:
-            # only warn if not explicitly specified
-            # don't check stacklevel since its set for concat, and append
-            # has an extra stack.
-            ctx = tm.assert_produces_warning(FutureWarning,
-                                             check_stacklevel=False)
-        else:
-            ctx = tm.assert_produces_warning(None)
-
-        with ctx:
-            result = df1.append(df2, sort=sort_with_none)
-
-        # for None / True
         expected = pd.DataFrame({"b": [1, 2, None, None],
                                  "a": [1, 2, 1, 2],
                                  "c": [None, None, 3, 4]},
-                                columns=['a', 'b', 'c'])
-        if sort_with_none is False:
-            expected = expected[['b', 'a', 'c']]
-        tm.assert_frame_equal(result, expected)
+                                columns=['b', 'a', 'c'])
+        if sort:
+            expected = expected[['a', 'b', 'c']]
+        assert_frame_equal(result, expected)
 
     def test_append_different_columns(self, sort):
         df = DataFrame({'bools': np.random.randn(10) > 0,
