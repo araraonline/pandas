@@ -414,7 +414,8 @@ class TestAppendColumnsIndex(object):
 
     @pytest.mark.parametrize('index', indexes, ids=cls_name)
     def test_preserve_index_type(self, sort, index):
-        # when there's only one index type in the inputs,
+        # GH: 18359
+        # When there's only one index type in the inputs,
         # it must be preserved in the output.
 
         # basic
