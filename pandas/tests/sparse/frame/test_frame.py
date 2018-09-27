@@ -629,9 +629,8 @@ class TestSparseDataFrame(SharedWithSparse):
 
         a = self.frame.iloc[:5, :3]
         b = self.frame.iloc[5:]
-        with tm.assert_produces_warning(FutureWarning, check_stacklevel=False):
-            # Stacklevel is set for pd.concat, not append
-            appended = a.append(b)
+        with tm.assert_produces_warning(None):
+            appended = a.append(b, sort=False)
         tm.assert_sp_frame_equal(appended.iloc[:, :3], self.frame.iloc[:, :3],
                                  exact_indices=False)
 
