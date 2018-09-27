@@ -1302,17 +1302,17 @@ class TestAppendDangling(object):
         df1 = pd.DataFrame([[1, 2, 3], [4, 5, 6]], index=index1)
         df2 = pd.DataFrame([[1, 2, 3], [4, 5, 6]], index=index2)
 
-        result = df1.append(df2, ignore_index=True)
+        result = df1.append(df2, ignore_index=True, sort=sort)
         expected = pd.DataFrame([[1, 2, 3], [4, 5, 6],
                                  [1, 2, 3], [4, 5, 6]])
         assert_frame_equal(result, expected)
 
-        result = df1.append([df2], ignore_index=True)
+        result = df1.append([df2], ignore_index=True, sort=sort)
         expected = pd.DataFrame([[1, 2, 3], [4, 5, 6],
                                  [1, 2, 3], [4, 5, 6]])
         assert_frame_equal(result, expected)
 
-        result = df1.append([df2, df2], ignore_index=True)
+        result = df1.append([df2, df2], ignore_index=True, sort=sort)
         expected = pd.DataFrame([[1, 2, 3], [4, 5, 6],
                                  [1, 2, 3], [4, 5, 6],
                                  [1, 2, 3], [4, 5, 6]])
