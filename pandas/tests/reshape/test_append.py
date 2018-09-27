@@ -856,7 +856,7 @@ class TestAppendBefore(object):
         begin_frame = self.frame.reindex(begin_index)
         end_frame = self.frame.reindex(end_index)
 
-        appended = begin_frame.append(end_frame)
+        appended = begin_frame.append(end_frame, sort=sort)
         tm.assert_almost_equal(appended['A'], self.frame['A'])
 
         del end_frame['A']
@@ -867,7 +867,7 @@ class TestAppendBefore(object):
         assert 'A' in partial_appended
 
         # mixed type handling
-        appended = self.mixed_frame[:5].append(self.mixed_frame[5:])
+        appended = self.mixed_frame[:5].append(self.mixed_frame[5:], sort=sort)
         tm.assert_frame_equal(appended, self.mixed_frame)
 
         # what to test here
@@ -883,24 +883,24 @@ class TestAppendBefore(object):
         # append empty
         empty = DataFrame({})
 
-        appended = self.frame.append(empty)
+        appended = self.frame.append(empty, sort=sort)
         tm.assert_frame_equal(self.frame, appended)
         assert appended is not self.frame
 
-        appended = empty.append(self.frame)
+        appended = empty.append(self.frame, sort=sort)
         tm.assert_frame_equal(self.frame, appended)
         assert appended is not self.frame
 
         # Overlap
         with pytest.raises(ValueError):
-            self.frame.append(self.frame, verify_integrity=True)
+            self.frame.append(self.frame, verify_integrity=True, sort=sort)
 
         # see gh-6129: new columns
         df = DataFrame({'a': {'x': 1, 'y': 2}, 'b': {'x': 3, 'y': 4}})
         row = Series([5, 6, 7], index=['a', 'b', 'c'], name='z')
         expected = DataFrame({'a': {'x': 1, 'y': 2, 'z': 5}, 'b': {
                              'x': 3, 'y': 4, 'z': 6}, 'c': {'z': 7}})
-        result = df.append(row)
+        result = df.append(row, sort=sort)
         tm.assert_frame_equal(result, expected)
 
     def test_append_length0_frame(self, sort):
@@ -911,7 +911,7 @@ class TestAppendBefore(object):
         expected = DataFrame(index=[0, 1], columns=['A', 'B', 'C'])
         assert_frame_equal(df5, expected)
 
-    def test_append_records(self):
+    def test_append_records(self, sort):
         arr1 = np.zeros((2,), dtype=('i4,f4,a10'))
         arr1[:] = [(1, 2., 'Hello'), (2, 3., "World")]
 
@@ -923,7 +923,7 @@ class TestAppendBefore(object):
         df1 = DataFrame(arr1)
         df2 = DataFrame(arr2)
 
-        result = df1.append(df2, ignore_index=True)
+        result = df1.append(df2, ignore_index=True, sort=sort)
         expected = DataFrame(np.concatenate((arr1, arr2)))
         assert_frame_equal(result, expected)
 
@@ -970,7 +970,7 @@ class TestAppendBefore(object):
         chunks = [self.frame[:5], self.frame[5:10],
                   self.frame[10:15], self.frame[15:]]
 
-        result = chunks[0].append(chunks[1:])
+        result = chunks[0].append(chunks[1:], sort=sort)
         tm.assert_frame_equal(result, self.frame)
 
         chunks[-1] = chunks[-1].copy()
@@ -980,7 +980,7 @@ class TestAppendBefore(object):
         assert (result['foo'][15:] == 'bar').all()
         assert result['foo'][:15].isna().all()
 
-    def test_append_preserve_index_name(self):
+    def test_append_preserve_index_name(self, sort):
         # #980
         df1 = DataFrame(data=None, columns=['A', 'B', 'C'])
         df1 = df1.set_index(['A'])
@@ -988,7 +988,7 @@ class TestAppendBefore(object):
                         columns=['A', 'B', 'C'])
         df2 = df2.set_index(['A'])
 
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         assert result.index.name == 'A'
 
     indexes_can_append = [
@@ -1124,93 +1124,93 @@ class TestAppendBefore(object):
 
         appended = df1.append(df2, ignore_index=True, sort=sort)
         assert appended['A'].dtype == 'f8'
-        assert appended['B'].dtype == 'O'
+        assert appended['B'].dtype == 'f8'
 
     # tests below came from pandas/tests/frame/test_combine_concat.py
 
-    def test_append_series_dict(self):
+    def test_append_series_dict(self, sort):
         df = DataFrame(np.random.randn(5, 4),
                        columns=['foo', 'bar', 'baz', 'qux'])
 
         series = df.loc[4]
         with tm.assert_raises_regex(ValueError,
                                     'Indexes have overlapping values'):
-            df.append(series, verify_integrity=True)
+            df.append(series, verify_integrity=True, sort=sort)
         series.name = None
         with tm.assert_raises_regex(TypeError,
                                     'Can only append a Series if '
                                     'ignore_index=True'):
-            df.append(series, verify_integrity=True)
+            df.append(series, verify_integrity=True, sort=sort)
 
-        result = df.append(series[::-1], ignore_index=True)
+        result = df.append(series[::-1], ignore_index=True, sort=sort)
         expected = df.append(DataFrame({0: series[::-1]}, index=df.columns).T,
-                             ignore_index=True)
+                             ignore_index=True, sort=sort)
         assert_frame_equal(result, expected)
 
         # dict
-        result = df.append(series.to_dict(), ignore_index=True)
+        result = df.append(series.to_dict(), ignore_index=True, sort=sort)
         assert_frame_equal(result, expected)
 
-        result = df.append(series[::-1][:3], ignore_index=True)
+        result = df.append(series[::-1][:3], ignore_index=True, sort=sort)
         expected = df.append(DataFrame({0: series[::-1][:3]}).T,
-                             ignore_index=True, sort=True)
+                             ignore_index=True, sort=sort)
         assert_frame_equal(result, expected.loc[:, result.columns])
 
         # can append when name set
         row = df.loc[4]
         row.name = 5
-        result = df.append(row)
-        expected = df.append(df[-1:], ignore_index=True)
+        result = df.append(row, sort=sort)
+        expected = df.append(df[-1:], ignore_index=True, sort=sort)
         assert_frame_equal(result, expected)
 
-    def test_append_list_of_series_dicts(self):
+    def test_append_list_of_series_dicts(self, sort):
         df = DataFrame(np.random.randn(5, 4),
                        columns=['foo', 'bar', 'baz', 'qux'])
 
         dicts = [x.to_dict() for idx, x in df.iterrows()]
 
-        result = df.append(dicts, ignore_index=True)
-        expected = df.append(df, ignore_index=True)
+        result = df.append(dicts, ignore_index=True, sort=sort)
+        expected = df.append(df, ignore_index=True, sort=sort)
         assert_frame_equal(result, expected)
 
         # different columns
         dicts = [{'foo': 1, 'bar': 2, 'baz': 3, 'peekaboo': 4},
                  {'foo': 5, 'bar': 6, 'baz': 7, 'peekaboo': 8}]
-        result = df.append(dicts, ignore_index=True, sort=True)
-        expected = df.append(DataFrame(dicts), ignore_index=True, sort=True)
+        result = df.append(dicts, ignore_index=True, sort=sort)
+        expected = df.append(DataFrame(dicts), ignore_index=True, sort=sort)
         assert_frame_equal(result, expected)
 
-    def test_append_empty_dataframe(self):
+    def test_append_empty_dataframe(self, sort):
 
         # Empty df append empty df
         df1 = DataFrame([])
         df2 = DataFrame([])
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         expected = df1.copy()
         assert_frame_equal(result, expected)
 
         # Non-empty df append empty df
         df1 = DataFrame(np.random.randn(5, 2))
         df2 = DataFrame()
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         expected = df1.copy()
         assert_frame_equal(result, expected)
 
         # Empty df with columns append empty df
         df1 = DataFrame(columns=['bar', 'foo'])
         df2 = DataFrame()
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         expected = df1.copy()
         assert_frame_equal(result, expected)
 
         # Non-Empty df with columns append empty df
         df1 = DataFrame(np.random.randn(5, 2), columns=['bar', 'foo'])
         df2 = DataFrame()
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         expected = df1.copy()
         assert_frame_equal(result, expected)
 
-    def test_append_dtypes(self):
+    def test_append_dtypes(self, sort):
 
         # GH 5754
         # row appends of different dtypes (so need to do by-item)
@@ -1218,40 +1218,40 @@ class TestAppendBefore(object):
 
         df1 = DataFrame({'bar': Timestamp('20130101')}, index=lrange(5))
         df2 = DataFrame()
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         expected = df1.copy()
         assert_frame_equal(result, expected)
 
         df1 = DataFrame({'bar': Timestamp('20130101')}, index=lrange(1))
         df2 = DataFrame({'bar': 'foo'}, index=lrange(1, 2))
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         expected = DataFrame({'bar': [Timestamp('20130101'), 'foo']})
         assert_frame_equal(result, expected)
 
         df1 = DataFrame({'bar': Timestamp('20130101')}, index=lrange(1))
         df2 = DataFrame({'bar': np.nan}, index=lrange(1, 2))
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         expected = DataFrame(
             {'bar': Series([Timestamp('20130101'), np.nan], dtype='M8[ns]')})
         assert_frame_equal(result, expected)
 
         df1 = DataFrame({'bar': Timestamp('20130101')}, index=lrange(1))
         df2 = DataFrame({'bar': np.nan}, index=lrange(1, 2), dtype=object)
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         expected = DataFrame(
             {'bar': Series([Timestamp('20130101'), np.nan], dtype='M8[ns]')})
         assert_frame_equal(result, expected)
 
         df1 = DataFrame({'bar': np.nan}, index=lrange(1))
         df2 = DataFrame({'bar': Timestamp('20130101')}, index=lrange(1, 2))
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         expected = DataFrame(
             {'bar': Series([np.nan, Timestamp('20130101')], dtype='M8[ns]')})
         assert_frame_equal(result, expected)
 
         df1 = DataFrame({'bar': Timestamp('20130101')}, index=lrange(1))
         df2 = DataFrame({'bar': 1}, index=lrange(1, 2), dtype=object)
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         expected = DataFrame({'bar': Series([Timestamp('20130101'), 1])})
         assert_frame_equal(result, expected)
 
