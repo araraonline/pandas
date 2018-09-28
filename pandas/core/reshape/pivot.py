@@ -583,7 +583,7 @@ def _normalize(table, normalize, margins, margins_name='All'):
 
         elif normalize == 'index':
             index_margin = index_margin / index_margin.sum()
-            table = table.append(index_margin)
+            table = table.append(index_margin, sort=False)
             table = table.fillna(0)
 
         elif normalize == "all" or normalize is True:
@@ -591,7 +591,7 @@ def _normalize(table, normalize, margins, margins_name='All'):
             index_margin = index_margin / index_margin.sum()
             index_margin.loc[margins_name] = 1
             table = concat([table, column_margin], axis=1)
-            table = table.append(index_margin)
+            table = table.append(index_margin, sort=False)
 
             table = table.fillna(0)
 
