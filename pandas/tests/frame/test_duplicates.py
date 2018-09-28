@@ -177,8 +177,9 @@ def test_drop_duplicates():
     tm.assert_frame_equal(df.drop_duplicates(), df)
 
     # GH 11864
-    df = DataFrame([i] * 9 for i in range(16))
-    df = df.append([[1] + [0] * 8], ignore_index=True)
+    df1 = DataFrame([i] * 9 for i in range(16))
+    df2 = DataFrame([[1] + [0] * 8])
+    df = df1.append(df2, ignore_index=True, sort=False)
 
     for keep in ['first', 'last', False]:
         assert df.duplicated(keep=keep).sum() == 0
