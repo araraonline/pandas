@@ -192,7 +192,8 @@ class TestPartialSetting(object):
         # columns will align
         df = DataFrame(columns=['A', 'B'])
         df.loc[0] = Series(1, index=range(4))
-        tm.assert_frame_equal(df, DataFrame(columns=['A', 'B'], index=[0]))
+        exp = DataFrame(columns=['A', 'B'], index=[0], dtype='float64')
+        tm.assert_frame_equal(df, exp)
 
         # columns will align
         df = DataFrame(columns=['A', 'B'])
@@ -210,12 +211,10 @@ class TestPartialSetting(object):
 
         pytest.raises(ValueError, f)
 
-        # TODO: #15657, these are left as object and not coerced
         df = DataFrame(columns=['A', 'B'])
         df.loc[3] = [6, 7]
 
-        exp = DataFrame([[6, 7]], index=[3], columns=['A', 'B'],
-                        dtype='object')
+        exp = DataFrame([[6, 7]], index=[3], columns=['A', 'B'])
         tm.assert_frame_equal(df, exp)
 
     def test_series_partial_set(self):
