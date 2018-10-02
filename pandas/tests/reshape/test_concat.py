@@ -346,7 +346,7 @@ class TestConcatAppendCommon(ConcatenateBase):
                                     '2014-07-21'], tz=tz)
         exp = pd.DataFrame(0, index=exp_idx, columns=['A', 'B'])
 
-        tm.assert_frame_equal(df1.append(df2), exp)
+        tm.assert_frame_equal(df1.append(df2, sort=False), exp)
         tm.assert_frame_equal(pd.concat([df1, df2]), exp)
 
     def test_concatlike_datetimetz_to_object(self, tz_aware_fixture):
@@ -1309,7 +1309,7 @@ class TestConcatenate(ConcatenateBase):
                          'D': np.array([1, 2, 3, 4], dtype='f8')},
                         columns=columns)
 
-        appended = df1.append(df2, ignore_index=True)
+        appended = df1.append(df2, ignore_index=True, sort=False)
         expected = DataFrame(np.concatenate([df1.values, df2.values], axis=0),
                              columns=columns)
         tm.assert_frame_equal(appended, expected)
@@ -1352,14 +1352,14 @@ class TestConcatenate(ConcatenateBase):
         assert_frame_equal(result.iloc[10:], df)
 
         # append
-        result = df.iloc[0:8, :].append(df.iloc[8:])
+        result = df.iloc[0:8, :].append(df.iloc[8:], sort=False)
         assert_frame_equal(result, df)
 
-        result = df.iloc[0:8, :].append(df.iloc[8:9]).append(df.iloc[9:10])
+        result = df.iloc[0:8, :].append(df.iloc[8:9]).append(df.iloc[9:10], sort=False)
         assert_frame_equal(result, df)
 
         expected = concat([df, df], axis=0)
-        result = df.append(df)
+        result = df.append(df, sort=False)
         assert_frame_equal(result, expected)
 
     def test_with_mixed_tuples(self, sort):
@@ -2146,7 +2146,7 @@ bar2,12,13,14,15
                         index=Index([0, 1, 0, 1]))
 
         tm.assert_frame_equal(pd.concat([df, df]), exp)
-        tm.assert_frame_equal(df.append(df), exp)
+        tm.assert_frame_equal(df.append(df, sort=False), exp)
 
         # GH 13524 can concat different categories
         cat3 = Categorical(["a", "b"], categories=["a", "b", "c"])
@@ -2157,7 +2157,7 @@ bar2,12,13,14,15
         exp = DataFrame({"cats": list('abab'), "vals": [1, 2, 1, 2]})
         tm.assert_frame_equal(res, exp)
 
-        res = df.append(df_different_categories, ignore_index=True)
+        res = df.append(df_different_categories, ignore_index=True, sort=False)
         tm.assert_frame_equal(res, exp)
 
     def test_categorical_concat_dtypes(self):
@@ -2219,7 +2219,7 @@ bar2,12,13,14,15
         tm.assert_index_equal(df['grade'].cat.categories,
                               dfx['grade'].cat.categories)
 
-        dfa = df1.append(df2)
+        dfa = df1.append(df2, sort=False)
         tm.assert_index_equal(df['grade'].cat.categories,
                               dfa['grade'].cat.categories)
 
