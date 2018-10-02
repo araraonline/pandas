@@ -739,7 +739,7 @@ class TestAppend(ConcatenateBase):
         begin_frame = self.frame.reindex(begin_index)
         end_frame = self.frame.reindex(end_index)
 
-        appended = begin_frame.append(end_frame)
+        appended = begin_frame.append(end_frame, sort=sort)
         tm.assert_almost_equal(appended['A'], self.frame['A'])
 
         del end_frame['A']
@@ -750,7 +750,7 @@ class TestAppend(ConcatenateBase):
         assert 'A' in partial_appended
 
         # mixed type handling
-        appended = self.mixed_frame[:5].append(self.mixed_frame[5:])
+        appended = self.mixed_frame[:5].append(self.mixed_frame[5:], sort=sort)
         tm.assert_frame_equal(appended, self.mixed_frame)
 
         # what to test here
@@ -766,24 +766,24 @@ class TestAppend(ConcatenateBase):
         # append empty
         empty = DataFrame({})
 
-        appended = self.frame.append(empty)
+        appended = self.frame.append(empty, sort=sort)
         tm.assert_frame_equal(self.frame, appended)
         assert appended is not self.frame
 
-        appended = empty.append(self.frame)
+        appended = empty.append(self.frame, sort=sort)
         tm.assert_frame_equal(self.frame, appended)
         assert appended is not self.frame
 
         # Overlap
         with pytest.raises(ValueError):
-            self.frame.append(self.frame, verify_integrity=True)
+            self.frame.append(self.frame, verify_integrity=True, sort=sort)
 
         # see gh-6129: new columns
         df = DataFrame({'a': {'x': 1, 'y': 2}, 'b': {'x': 3, 'y': 4}})
         row = Series([5, 6, 7], index=['a', 'b', 'c'], name='z')
         expected = DataFrame({'a': {'x': 1, 'y': 2, 'z': 5}, 'b': {
                              'x': 3, 'y': 4, 'z': 6}, 'c': {'z': 7}})
-        result = df.append(row)
+        result = df.append(row, sort=sort)
         tm.assert_frame_equal(result, expected)
 
     def test_append_length0_frame(self, sort):
@@ -794,7 +794,7 @@ class TestAppend(ConcatenateBase):
         expected = DataFrame(index=[0, 1], columns=['A', 'B', 'C'])
         assert_frame_equal(df5, expected)
 
-    def test_append_records(self):
+    def test_append_records(self, sort):
         arr1 = np.zeros((2,), dtype=('i4,f4,a10'))
         arr1[:] = [(1, 2., 'Hello'), (2, 3., "World")]
 
@@ -806,7 +806,7 @@ class TestAppend(ConcatenateBase):
         df1 = DataFrame(arr1)
         df2 = DataFrame(arr2)
 
-        result = df1.append(df2, ignore_index=True)
+        result = df1.append(df2, ignore_index=True, sort=sort)
         expected = DataFrame(np.concatenate((arr1, arr2)))
         assert_frame_equal(result, expected)
 
@@ -853,7 +853,7 @@ class TestAppend(ConcatenateBase):
         chunks = [self.frame[:5], self.frame[5:10],
                   self.frame[10:15], self.frame[15:]]
 
-        result = chunks[0].append(chunks[1:])
+        result = chunks[0].append(chunks[1:], sort=sort)
         tm.assert_frame_equal(result, self.frame)
 
         chunks[-1] = chunks[-1].copy()
@@ -863,7 +863,7 @@ class TestAppend(ConcatenateBase):
         assert (result['foo'][15:] == 'bar').all()
         assert result['foo'][:15].isna().all()
 
-    def test_append_preserve_index_name(self):
+    def test_append_preserve_index_name(self, sort):
         # #980
         df1 = DataFrame(data=None, columns=['A', 'B', 'C'])
         df1 = df1.set_index(['A'])
@@ -871,7 +871,7 @@ class TestAppend(ConcatenateBase):
                         columns=['A', 'B', 'C'])
         df2 = df2.set_index(['A'])
 
-        result = df1.append(df2)
+        result = df1.append(df2, sort=sort)
         assert result.index.name == 'A'
 
     indexes_can_append = [
