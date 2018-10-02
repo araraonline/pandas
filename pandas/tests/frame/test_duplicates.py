@@ -178,7 +178,7 @@ def test_drop_duplicates():
 
     # GH 11864
     df = DataFrame([i] * 9 for i in range(16))
-    df = df.append([[1] + [0] * 8], ignore_index=True)
+    df = df.append([[1] + [0] * 8], ignore_index=True, sort=False)
 
     for keep in ['first', 'last', False]:
         assert df.duplicated(keep=keep).sum() == 0
