@@ -1355,7 +1355,7 @@ class TestConcatenate(ConcatenateBase):
         result = df.iloc[0:8, :].append(df.iloc[8:], sort=False)
         assert_frame_equal(result, df)
 
-        result = df.iloc[0:8, :].append(df.iloc[8:9]).append(df.iloc[9:10], sort=False)
+        result = df.iloc[0:8, :].append(df.iloc[8:9], sort=False).append(df.iloc[9:10], sort=False)
         assert_frame_equal(result, df)
 
         expected = concat([df, df], axis=0)
