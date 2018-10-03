@@ -89,29 +89,15 @@ def _union_indexes(indexes, sort=True):
     if len(indexes) == 1:
         result = indexes[0]
         if isinstance(result, list):
-            result = Index(sorted(result))
+            result = Index(sorted(result))  # why do we sort??
         return result
 
+    # convert lists to indexes
+    # check if at least one 'special'
     indexes, kind = _sanitize_and_check(indexes)
 
-    def _unique_indices(inds):
-        def conv(i):
-            if isinstance(i, Index):
-                i = i.tolist()
-            return i
-
-        return Index(
-            lib.fast_unique_multiple_list([conv(i) for i in inds], sort=sort))
-
     if kind == 'special':
-        result = indexes[0]
-
-        if hasattr(result, 'union_many'):
-            return result.union_many(indexes[1:])
-        else:
-            for other in indexes[1:]:
-                result = result.union(other)
-            return result
+        return _union_indexes_special(indexes, sort=sort)
     elif kind == 'array':
         index = indexes[0]
         for other in indexes[1:]:
@@ -132,6 +118,21 @@ def _union_indexes(indexes, sort=True):
         return _unique_indices(indexes)
 
 
+def _union_indexes_special(indexes, sort=True):
+    if sort:
+        result = indexes[0]
+
+        if hasattr(result, 'union_many'):  # DatetimeIndex
+            return result.union_many(indexes[1:])
+        else:
+            for other in indexes[1:]:
+                result = result.union(other)
+            return result
+    else:
+        raise NotImplementedError
+
+
+
 def _sanitize_and_check(indexes):
     kinds = {type(index) for index in indexes}
 
@@ -150,6 +151,16 @@ def _sanitize_and_check(indexes):
         return indexes, 'special'
     else:
         return indexes, 'array'
+
+
+def _unique_indices(inds):
+    def conv(i):
+        if isinstance(i, Index):
+            i = i.tolist()
+        return i
+
+    return Index(
+        lib.fast_unique_multiple_list([conv(i) for i in inds], sort=sort))
 
 
 def _get_consensus_names(indexes):
