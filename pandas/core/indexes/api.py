@@ -64,7 +64,7 @@ def _intersect_indexes(indexes, sort=True):
     """Return the intersection of indexes
     """
     if len(indexes) == 0:
-        return Index([])
+        return Index([])  # TODO
 
     indexes = com.get_distinct_objs(indexes)  # distinct ids
 
@@ -82,7 +82,10 @@ def _intersect_indexes(indexes, sort=True):
 
 def _union_indexes(indexes, sort=True):
     if len(indexes) == 0:
-        raise AssertionError('Must have at least 1 Index to union')
+        return Index([])
+
+    indexes = com.get_distinct_objs(indexes)
+
     if len(indexes) == 1:
         result = indexes[0]
         if isinstance(result, list):
@@ -127,9 +130,6 @@ def _union_indexes(indexes, sort=True):
         return index
     else:  # kind='list'
         return _unique_indices(indexes)
-
-
-
 
 
 def _sanitize_and_check(indexes):
