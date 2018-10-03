@@ -133,18 +133,20 @@ def _union_indexes(indexes, sort=True):
 
 
 def _sanitize_and_check(indexes):
-    kinds = list({type(index) for index in indexes})
+    kinds = {type(index) for index in indexes}
 
     if list in kinds:
         if len(kinds) > 1:
-            indexes = [Index(com.try_sort(x))
-                       if not isinstance(x, Index) else
-                       x for x in indexes]
+            # e.g. indexes = [Index([2, 3]), [[1, 2]])
+            indexes = [Index(x) if isinstance(x, list) else x
+                       for x in indexes]
             kinds.remove(list)
         else:
+            #e.g. indexes = [[1, 2]]
             return indexes, 'list'
 
     if len(kinds) > 1 or Index not in kinds:
+        # equivalent to any(kind != Index for kind in kinds)
         return indexes, 'special'
     else:
         return indexes, 'array'
