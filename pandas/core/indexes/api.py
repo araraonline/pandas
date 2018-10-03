@@ -69,7 +69,7 @@ def _intersect_indexes(indexes, sort=True):
     indexes = com.get_distinct_objs(indexes)  # distinct ids
 
     result = indexes[0]
-    for other in indexes[1:]
+    for other in indexes[1:]:
         result = result.intersection(other)
         
     if sort:
@@ -85,12 +85,6 @@ def _union_indexes(indexes, sort=True):
         return Index([])
 
     indexes = com.get_distinct_objs(indexes)
-
-    if len(indexes) == 1:
-        result = indexes[0]
-        if isinstance(result, list):
-            result = Index(sorted(result))  # why do we sort??
-        return result
 
     # convert lists to indexes
     # check if at least one 'special'
@@ -123,6 +117,8 @@ def _union_indexes_no_special(indexes, sort=True):
         name = _get_consensus_names(indexes)[0]
         if name != index.name:
             index = index._shallow_copy(name=name)
+        if sort:
+            index = _maybe_sort(index)
         return index
     else:
         # but not here
