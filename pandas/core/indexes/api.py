@@ -99,23 +99,24 @@ def _union_indexes(indexes, sort=True):
     if kind == 'special':
         return _union_indexes_special(indexes, sort=sort)
     elif kind == 'array':
+
         index = indexes[0]
-        for other in indexes[1:]:
-            if not index.equals(other):
+        if _all_indexes_same(indexes):
+            # name handled here
+            name = _get_consensus_names(indexes)[0]
+            if name != index.name:
+                index = index._shallow_copy(name=name)
+            return index
+        else:
+            # but not here
+            if sort is None:
+                # TODO: remove once pd.concat and df.append sort default changes
+                warnings.warn(_sort_msg, FutureWarning, stacklevel=8)
+                sort = True
+            return _unique_indices(indexes, sort=sort)
 
-                if sort is None:
-                    # TODO: remove once pd.concat sort default changes
-                    warnings.warn(_sort_msg, FutureWarning, stacklevel=8)
-                    sort = True
-
-                return _unique_indices(indexes)
-
-        name = _get_consensus_names(indexes)[0]
-        if name != index.name:
-            index = index._shallow_copy(name=name)
-        return index
     else:  # kind='list'
-        return _unique_indices(indexes)
+        return _unique_indices(indexes, sort=sort)
 
 
 def _union_indexes_special(indexes, sort=True):
@@ -153,7 +154,7 @@ def _sanitize_and_check(indexes):
         return indexes, 'array'
 
 
-def _unique_indices(inds):
+def _unique_indices(inds, sort=sort):
     def conv(i):
         if isinstance(i, Index):
             i = i.tolist()
