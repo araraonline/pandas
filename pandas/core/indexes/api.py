@@ -98,25 +98,8 @@ def _union_indexes(indexes, sort=True):
 
     if kind == 'special':
         return _union_indexes_special(indexes, sort=sort)
-    elif kind == 'array':
-
-        index = indexes[0]
-        if _all_indexes_same(indexes):
-            # name handled here
-            name = _get_consensus_names(indexes)[0]
-            if name != index.name:
-                index = index._shallow_copy(name=name)
-            return index
-        else:
-            # but not here
-            if sort is None:
-                # TODO: remove once pd.concat and df.append sort default changes
-                warnings.warn(_sort_msg, FutureWarning, stacklevel=8)
-                sort = True
-            return _unique_indices(indexes, sort=sort)
-
-    else:  # kind='list'
-        return _unique_indices(indexes, sort=sort)
+    else:
+        return _union_indexes_no_special(indexes, sort=sort)
 
 
 def _union_indexes_special(indexes, sort=True):
@@ -132,6 +115,22 @@ def _union_indexes_special(indexes, sort=True):
     else:
         raise NotImplementedError
 
+
+def _union_indexes_no_special(indexes, sort=True):
+    index = indexes[0]
+    if _all_indexes_same(indexes):
+        # name handled here
+        name = _get_consensus_names(indexes)[0]
+        if name != index.name:
+            index = index._shallow_copy(name=name)
+        return index
+    else:
+        # but not here
+        if sort is None:
+            # TODO: remove once pd.concat and df.append sort default changes
+            warnings.warn(_sort_msg, FutureWarning, stacklevel=8)
+            sort = True
+        return _unique_indices(indexes, sort=sort)
 
 
 def _sanitize_and_check(indexes):
