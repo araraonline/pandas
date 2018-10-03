@@ -7,6 +7,7 @@ from pandas.core.indexes.base import (Index,
                                       ensure_index_from_sequences,
                                       InvalidIndexError)  # noqa
 from pandas.core.indexes.category import CategoricalIndex  # noqa
+from pandas.core.indexes.frozen import FrozenList
 from pandas.core.indexes.multi import MultiIndex  # noqa
 from pandas.core.indexes.interval import IntervalIndex  # noqa
 from pandas.core.indexes.numeric import (NumericIndex, Float64Index,  # noqa
@@ -237,14 +238,11 @@ def _get_consensus_names(indexes):
     list
         A list representing the consensus 'names' found
     """
-
-    # find the non-none names, need to tupleify to make
-    # the set hashable, then reverse on return
-    consensus_names = {tuple(i.names) for i in indexes
-                       if com._any_not_none(*i.names)}
-    if len(consensus_names) == 1:
-        return list(list(consensus_names)[0])
-    return [None] * indexes[0].nlevels
+    non_empty = {i.names for i in indexes if com._any_not_none(*i.names)}
+    if len(non_empty) == 1:
+        return non_empty.pop()
+    else:
+        return FrozenList([None] * indexes[0].nlevels)
 
 
 def _all_indexes_same(indexes):
