@@ -54,26 +54,30 @@ def _get_objs_combined_axis(objs, intersect=False, axis=0, sort=True):
 
 
 def _get_combined_index(indexes, intersect=False, sort=False):
-    # TODO: handle index names!
-    indexes = com.get_distinct_objs(indexes)
-
-    if len(indexes) == 0:
-        index = Index([])
-    elif len(indexes) == 1:
-        index = indexes[0]
-    elif intersect:
+    if intersect:
         return _intersect_indexes(indexes, sort=sort)
     else:
-        index = _union_indexes(indexes, sort=sort)
-        index = ensure_index(index)
+        return _union_indexes(indexes, sort=sort)
 
+
+def _intersect_indexes(indexes, sort=True):
+    """Return the intersection of indexes
+    """
+    if len(indexes) == 0:
+        return Index([])
+
+    indexes = com.get_distinct_objs(indexes)  # distinct ids
+
+    result = indexes[0]
+    for other in indexes[1:]
+        result = result.intersection(other)
+        
     if sort:
-        try:
-            index = index.sort_values()
-        except TypeError:
-            pass
+        result = _maybe_sort(result)
 
-    return index
+    # TODO: names
+
+    return result
 
 
 def _union_indexes(indexes, sort=True):
@@ -125,22 +129,6 @@ def _union_indexes(indexes, sort=True):
         return _unique_indices(indexes)
 
 
-def _intersect_indexes(indexes, sort=True):
-    """Return the intersection of indexes
-    """
-    if len(indexes) == 0:
-        return Index([])
-
-    indexes = com.get_distinct_objs(indexes)  # distinct ids
-
-    result = indexes[0]
-    for other in indexes[1:]
-        result = result.intersection(other)
-        
-    if sort:
-        result = _maybe_sort(result)
-
-    return result
 
 
 
