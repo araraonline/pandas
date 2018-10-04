@@ -372,7 +372,7 @@ class DataFrame(NDFrame):
     def __init__(self, data=None, index=None, columns=None, dtype=None,
                  copy=False):
         if data is None:
-            data = {}
+            data = dict()
         if dtype is not None:
             dtype = self._validate_dtype(dtype)
 
