@@ -135,15 +135,6 @@ def _union_indexes(indexes, sort=True):
     -------
     Index
     """
-    if len(indexes) == 0:
-        raise AssertionError('Must have at least 1 Index to union')
-    if len(indexes) == 1:
-        result = indexes[0]
-        if isinstance(result, list):
-            result = Index(sorted(result))
-        return result
-
-    indexes, kind = _sanitize_and_check(indexes)
 
     def _unique_indices(inds):
         """Convert indexes to lists and concatenate them, removing duplicates
@@ -167,6 +158,15 @@ def _union_indexes(indexes, sort=True):
         ind_values = lib.fast_unique_multiple_list(inds, sort=sort)
         return Index(ind_values)
 
+    if len(indexes) == 0:
+        raise AssertionError('Must have at least 1 Index to union')
+    if len(indexes) == 1:
+        result = indexes[0]
+        if isinstance(result, list):
+            result = Index(sorted(result))
+        return result
+
+    indexes, kind = _sanitize_and_check(indexes)
     if kind == 'special':
         result = indexes[0]
 
