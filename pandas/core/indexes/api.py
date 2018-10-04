@@ -96,9 +96,7 @@ def _get_combined_index(indexes, intersect=False, sort=False):
     elif len(indexes) == 1:
         index = indexes[0]
     elif intersect:
-        index = indexes[0]
-        for other in indexes[1:]:
-            index = index.intersection(other)
+        index = _intersect_indexes(indexes)
     else:
         index = _union_indexes(indexes, sort=sort)
         index = ensure_index(index)
@@ -108,6 +106,17 @@ def _get_combined_index(indexes, intersect=False, sort=False):
             index = index.sort_values()
         except TypeError:
             pass
+    return index
+
+
+def _intersect_indexes(indexes):
+    """Return the intersection of indexes
+
+    Preserves the order of the first index.
+    """
+    index = indexes[0]
+    for other in indexes[1:]:
+        index = index.intersection(other)
     return index
 
 
