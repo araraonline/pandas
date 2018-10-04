@@ -163,8 +163,9 @@ def _union_indexes(indexes, sort=True):
                 i = i.tolist()
             return i
 
-        return Index(
-            lib.fast_unique_multiple_list([conv(i) for i in inds], sort=sort))
+        inds = [conv(i) for i in inds]
+        ind_values = lib.fast_unique_multiple_list(inds, sort=sort)
+        return Index(ind_values)
 
     if kind == 'special':
         result = indexes[0]
