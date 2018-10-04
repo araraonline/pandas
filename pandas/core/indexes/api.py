@@ -215,18 +215,18 @@ def _sanitize_and_check(indexes):
     sanitized_indexes: list of Index or array-like objects
     type: {'list', 'array', 'special'}
     """
-    kinds = list({type(index) for index in indexes})
+    kinds = {type(index) for index in indexes}
 
     if list in kinds:
-        if len(kinds) > 1:
-            indexes = [Index(com.try_sort(x))
-                       if not isinstance(x, Index) else
-                       x for x in indexes]
-            kinds.remove(list)
-        else:
+        if len(kinds) == 1:
             return indexes, 'list'
+        else:
+            indexes = [Index(com.try_sort(i))
+                       if not isinstance(i, Index) else i
+                       for i in indexes]
+            kinds.remove(list)
 
-    if len(kinds) > 1 or Index not in kinds:
+    if any(kind != Index for kind in kinds):
         return indexes, 'special'
     else:
         return indexes, 'array'
