@@ -168,15 +168,17 @@ def _union_indexes(indexes, sort=True):
 
     indexes, kind = _sanitize_and_check(indexes)
     if kind == 'special':
-        result = indexes[0]
 
+        result = indexes[0]
         if hasattr(result, 'union_many'):
             return result.union_many(indexes[1:])
         else:
             for other in indexes[1:]:
                 result = result.union(other)
             return result
+
     elif kind == 'array':
+
         if not _all_indexes_same(indexes):
             if sort is None:
                 # TODO: remove once pd.concat sort default changes
@@ -189,6 +191,7 @@ def _union_indexes(indexes, sort=True):
         if name != index.name:
             index = index._shallow_copy(name=name)
         return index
+
     else:  # kind='list'
         return _unique_indices(indexes)
 
