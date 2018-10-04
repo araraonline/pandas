@@ -193,7 +193,7 @@ def _union_indexes(indexes, sort=True):
                 sort = True
             return _unique_indices(indexes)
 
-    else:  # kind='list'
+    else:  # kind == 'list'
         return _unique_indices(indexes)
 
 
