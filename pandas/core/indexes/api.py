@@ -177,17 +177,14 @@ def _union_indexes(indexes, sort=True):
                 result = result.union(other)
             return result
     elif kind == 'array':
+        if not _all_indexes_same(indexes):
+            if sort is None:
+                # TODO: remove once pd.concat sort default changes
+                warnings.warn(_sort_msg, FutureWarning, stacklevel=8)
+                sort = True
+            return _unique_indices(indexes)
+
         index = indexes[0]
-        for other in indexes[1:]:
-            if not index.equals(other):
-
-                if sort is None:
-                    # TODO: remove once pd.concat sort default changes
-                    warnings.warn(_sort_msg, FutureWarning, stacklevel=8)
-                    sort = True
-
-                return _unique_indices(indexes)
-
         name = _get_consensus_names(indexes)[0]
         if name != index.name:
             index = index._shallow_copy(name=name)
